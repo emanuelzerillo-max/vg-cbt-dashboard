@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Verified Geo x CBT</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;padding:20px;color:#111}
+
+/* ── Header ── */
+.page-title{font-size:15px;font-weight:800;margin-bottom:2px}
+.page-sub{font-size:10px;color:#888;margin-bottom:14px}
+
+/* ── VG Explainer ── */
+.explainer{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.exp-card{background:#fff;border-radius:8px;padding:11px 14px;flex:1;min-width:180px;border:1px solid #e5e7eb}
+.exp-card h3{font-size:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:#555;margin-bottom:6px}
+.exp-card p{font-size:11px;color:#444;line-height:1.5}
+.exp-card .highlight{background:#fffbe6;border-left:3px solid #FFE600;padding:4px 8px;margin-top:6px;font-size:10px;color:#555;border-radius:0 4px 4px 0}
+.badge{display:inline-block;background:#FFE600;color:#111;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;margin-right:4px}
+.badge.green{background:#d1fae5;color:#065f46}
+.badge.red{background:#fee2e2;color:#991b1b}
+
+/* ── Tabs ── */
+.tabs{display:flex;gap:4px;margin-bottom:0}
+.tab{padding:8px 20px;border-radius:8px 8px 0 0;font-size:11px;font-weight:700;
+      letter-spacing:.5px;cursor:pointer;background:#dde1e7;color:#666;
+      border:1px solid #ccc;border-bottom:none}
+.tab.active{background:#fff;color:#111}
+.tab:hover:not(.active){background:#e8eaf0}
+
+/* ── Main panel ── */
+.panel{background:#fff;border:1px solid #ccc;border-radius:0 10px 10px 10px;padding:14px}
+
+/* ── Comparison grid ── */
+.cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:0}
+.vert-block{border:1px solid #e5e7eb;border-radius:10px;overflow:hidden}
+.vert-header{padding:8px 12px;font-size:11px;font-weight:800;letter-spacing:.4px}
+.vert-header.cbt{background:#1e3a5f;color:#fff}
+.vert-header.gm{background:#374151;color:#fff}
+.vert-header .sub{font-size:10px;font-weight:400;opacity:.7;margin-left:6px}
+
+/* ── Metric rows ── */
+.metric-row{display:flex;justify-content:space-between;align-items:center;
+             padding:7px 12px;border-bottom:1px solid #f3f4f6}
+.metric-row:last-child{border-bottom:none}
+.metric-label{font-size:10px;color:#555;font-weight:500}
+.metric-val{font-size:13px;font-weight:800;color:#111}
+.metric-sub{font-size:9px;color:#aaa;margin-top:1px}
+.metric-right{text-align:right}
+
+/* ── VG pie wrap ── */
+.vg-bar-wrap{padding:8px 12px;border-bottom:1px solid #f3f4f6}
+
+/* ── ENE compare row ── */
+.ene-compare{display:flex;gap:6px;padding:8px 12px;border-bottom:1px solid #f3f4f6;align-items:center}
+.ene-col{flex:1;text-align:center}
+.ene-col-label{font-size:9px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#888;margin-bottom:2px}
+.ene-col-val{font-size:14px;font-weight:800}
+.ene-col-val.vg{color:#059669}
+.ene-col-val.nvg{color:#dc2626}
+.ene-col-val.total{color:#111}
+.ene-divider{width:1px;background:#e5e7eb;align-self:stretch}
+.gap-badge{background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;
+            font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;
+            text-align:center;flex:none}
+
+/* ── Diff arrow ── */
+.diff{font-size:10px;color:#aaa;margin-top:2px}
+.note{margin-top:14px;font-size:10px;color:#aaa;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="page-title">Verified Geo &times; CBT &mdash; Overview</div>
+<div class="page-sub">Ene&ndash;Mar 2026 &nbsp;&middot;&nbsp; FORWARD &nbsp;&middot;&nbsp; Sites: MLA, MLB, MLM, MLC &nbsp;&middot;&nbsp; Fuente: SBOX_ADDRESSES.VW_SHIPMENTS_DISTRIBUTION</div>
+
+<!-- ── VG Explainer ── -->
+<div class="explainer">
+  <div class="exp-card">
+    <h3>&#x2713; &nbsp;Qu&eacute; es Verified Geo (VG)</h3>
+    <p>Atributo basado en el <strong>hist&oacute;rico de visitas efectivas</strong> de una direcci&oacute;n. Clasifica la geolocalizaci&oacute;n como verificada cuando tiene un m&iacute;nimo de <strong>3 visitas efectivas</strong> en un rango de distancia mediana de hasta <strong>40 metros</strong>.</p>
+    <div class="highlight">Una geo verificada = mayor precisi&oacute;n en la &uacute;ltima milla &rarr; mejores tasas de entrega</div>
+  </div>
+  <div class="exp-card">
+    <h3>&#x1F4CA; &nbsp;C&oacute;mo se mide</h3>
+    <p>Campo: <strong>SHP_RCV_ADDR_VERIFIED_GEO</strong></p>
+    <p style="margin-top:6px"><span class="badge green">VG</span> Valor &gt; 0 &rarr; direcci&oacute;n verificada</p>
+    <p style="margin-top:4px"><span class="badge red">Not VG</span> NULL / 0 &rarr; direcci&oacute;n sin verificar</p>
+    <div class="highlight">ENE% = NOT_DELIVERED &divide; (DELIVERED + NOT_DELIVERED)</div>
+  </div>
+  <div class="exp-card">
+    <h3>&#x1F30D; &nbsp;Benchmark interno (GM)</h3>
+    <p>En GM (ON), las geos verificadas logran:</p>
+    <p style="margin-top:6px;font-size:13px;font-weight:800;color:#059669">+15pp de IRD</p>
+    <p style="margin-top:2px;font-size:13px;font-weight:800;color:#dc2626">&minus;1.5pp de Bad Address</p>
+    <p style="margin-top:6px;font-size:10px;color:#888">vs. geos no verificadas (ref. H2-2024)</p>
+    <div class="highlight" style="margin-top:6px">IRD = Intento de Reparto Domiciliario exitoso. Inverso de ENE: a mayor IRD, menos no-entregas.</div>
+  </div>
+</div>
+
+<!-- ── Tabs ── -->
+<div class="tabs">
+  <div class="tab active" onclick="show('LATAM',this)">LATAM</div>
+  <div class="tab" onclick="show('MLA',this)">&#x1F1E6;&#x1F1F7; MLA</div>
+  <div class="tab" onclick="show('MLB',this)">&#x1F1E7;&#x1F1F7; MLB</div>
+  <div class="tab" onclick="show('MLM',this)">&#x1F1F2;&#x1F1FD; MLM</div>
+  <div class="tab" onclick="show('MLC',this)">&#x1F1E8;&#x1F1F1; MLC</div>
+</div>
+
+<div class="panel">
+  <div id="content"></div>
+  <div class="note">
+    Universo: envios FORWARD + ADDRESS con status final (DELIVERED / NOT_DELIVERED) &nbsp;&middot;&nbsp;
+    VG = SHP_RCV_ADDR_VERIFIED_GEO &gt; 0 &nbsp;&middot;&nbsp;
+    GM = referencia ON (mercado general)
+  </div>
+</div>
+
+<script>
+const DATA = {"LATAM": {"CBT": {"q": 17935819, "pct_vg": 86.6, "ene_total": 0.54, "ene_vg": 0.46, "ene_nvg": 1.0, "gap": 0.53}, "GM": {"q": 314208961, "pct_vg": 87.2, "ene_total": 0.63, "ene_vg": 0.58, "ene_nvg": 0.97, "gap": 0.39}}, "MLA": {"CBT": {"q": 809696, "pct_vg": 78.9, "ene_total": 4.58, "ene_vg": 4.46, "ene_nvg": 5.02, "gap": 0.56}, "GM": {"q": 20184231, "pct_vg": 82.5, "ene_total": 0.53, "ene_vg": 0.43, "ene_nvg": 0.95, "gap": 0.52}}, "MLB": {"CBT": {"q": 10843, "pct_vg": 87.5, "ene_total": 2.91, "ene_vg": 2.76, "ene_nvg": 3.91, "gap": 1.15}, "GM": {"q": 226948262, "pct_vg": 87.9, "ene_total": 0.68, "ene_vg": 0.64, "ene_nvg": 1.03, "gap": 0.39}}, "MLM": {"CBT": {"q": 16782498, "pct_vg": 87.0, "ene_total": 0.34, "ene_vg": 0.29, "ene_nvg": 0.69, "gap": 0.4}, "GM": {"q": 57974411, "pct_vg": 87.0, "ene_total": 0.5, "ene_vg": 0.45, "ene_nvg": 0.87, "gap": 0.42}}, "MLC": {"CBT": {"q": 332782, "pct_vg": 82.4, "ene_total": 0.26, "ene_vg": 0.21, "ene_nvg": 0.51, "gap": 0.3}, "GM": {"q": 9102057, "pct_vg": 83.0, "ene_total": 0.29, "ene_vg": 0.24, "ene_nvg": 0.5, "gap": 0.26}}};
+
+function fmt(n){ return n==null?'—':Math.round(n).toLocaleString('es-AR'); }
+function fmtP(v,d=2){ return v==null?'—':v.toFixed(d)+'%'; }
+
+function buildPanel(site) {
+  const d = DATA[site];
+  const verts = [
+    { key:'CBT', label:'CBT', sub:'Cross-Border Trade', cls:'cbt' },
+    { key:'GM',  label:'GM (ON)', sub:'Mercado General — referencia', cls:'gm' },
+  ];
+
+  let html = '<div class="cmp-grid">';
+  for (const v of verts) {
+    const m = d[v.key];
+    if (!m) { html += '<div class="vert-block"><div class="vert-header '+v.cls+'">Sin datos</div></div>'; continue; }
+    html += `
+    <div class="vert-block">
+      <div class="vert-header ${v.cls}">${v.label}<span class="sub">${v.sub}</span></div>
+
+      <!-- volumen -->
+      <div class="metric-row">
+        <div>
+          <div class="metric-label">Env&iacute;os analizados</div>
+          <div class="metric-sub">DELIVERED + NOT_DELIVERED</div>
+        </div>
+        <div class="metric-right">
+          <div class="metric-val">${fmt(m.q)}</div>
+        </div>
+      </div>
+
+      <!-- % VG pie -->
+      <div class="vg-bar-wrap">
+        <div style="display:flex;align-items:center;gap:12px">
+          <canvas id="pie-${v.key}-${site}" width="54" height="54" style="flex:none;width:54px;height:54px"></canvas>
+          <div style="font-size:10px;line-height:1.7">
+            <div><span style="display:inline-block;width:7px;height:7px;background:#FFE600;border-radius:50%;margin-right:3px"></span><strong>${fmtP(m.pct_vg,1)}</strong> VG</div>
+            <div><span style="display:inline-block;width:7px;height:7px;background:#d1d5db;border-radius:50%;margin-right:3px"></span><strong>${fmtP(100-m.pct_vg,1)}</strong> Not VG</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ENE breakdown -->
+      <div class="ene-compare">
+        <div class="ene-col">
+          <div class="ene-col-label">ENE Total</div>
+          <div class="ene-col-val total">${fmtP(m.ene_total)}</div>
+        </div>
+        <div class="ene-divider"></div>
+        <div class="ene-col">
+          <div class="ene-col-label">&#x2713; VG</div>
+          <div class="ene-col-val vg">${fmtP(m.ene_vg)}</div>
+        </div>
+        <div class="ene-divider"></div>
+        <div class="ene-col">
+          <div class="ene-col-label">&#x2715; Not VG</div>
+          <div class="ene-col-val nvg">${fmtP(m.ene_nvg)}</div>
+        </div>
+        <div class="gap-badge">+${fmtP(m.gap)} gap</div>
+      </div>
+
+      <!-- ENE total row -->
+      <div class="metric-row">
+        <div>
+          <div class="metric-label">Impacto Not VG</div>
+          <div class="metric-sub">${fmtP(100-m.pct_vg,1)} del volumen con ENE ${fmtP(m.gap)} mayor</div>
+        </div>
+        <div class="metric-right">
+          <div class="metric-val" style="font-size:12px;color:#c2410c">${((100-m.pct_vg)/100 * m.gap).toFixed(2)}pp sobre total</div>
+        </div>
+      </div>
+    </div>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+const _charts = {};
+
+function renderPies(site) {
+  const verts = ['CBT', 'GM'];
+  for (const v of verts) {
+    const id = `pie-${v}-${site}`;
+    const canvas = document.getElementById(id);
+    if (!canvas) continue;
+    if (_charts[id]) { _charts[id].destroy(); }
+    const m = DATA[site][v];
+    _charts[id] = new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        labels: ['VG', 'Not VG'],
+        datasets: [{
+          data: [m.pct_vg, 100 - m.pct_vg],
+          backgroundColor: ['#FFE600', '#d1d5db'],
+          borderWidth: 0,
+        }]
+      },
+      options: {
+        responsive: false,
+        cutout: '60%',
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        animation: { duration: 300 },
+        events: []
+      }
+    });
+  }
+}
+
+function show(site, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('content').innerHTML = buildPanel(site);
+  renderPies(site);
+}
+
+document.getElementById('content').innerHTML = buildPanel('LATAM');
+renderPies('LATAM');
+</script>
+</body>
+</html>
